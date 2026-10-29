@@ -22,6 +22,7 @@ $captureScript = Join-Path $installDir 'Capture-FailedLogin.ps1'
 # Verify the camera as the installing user before changing system settings.
 New-Item -ItemType Directory -Path $installDir, $output -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Capture-FailedLogin.ps1') -Destination $captureScript -Force
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Control.ps1') -Destination (Join-Path $installDir 'Control.ps1') -Force
 @{ CameraName=$CameraName; FFmpegPath=$ffmpeg; OutputDirectory=$output } |
     ConvertTo-Json | Set-Content -LiteralPath (Join-Path $installDir 'config.json') -Encoding UTF8
 & "$env:SystemRoot\System32\icacls.exe" $installDir /inheritance:r /grant:r 'SYSTEM:(OI)(CI)F' 'Administrators:(OI)(CI)F' | Out-Null
