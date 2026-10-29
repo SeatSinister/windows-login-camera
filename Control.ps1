@@ -7,12 +7,10 @@ param(
 $ErrorActionPreference = 'Stop'
 $taskName = 'WindowsLoginCamera'
 
-if ($Action -ne 'status') {
-    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
-    $principal = New-Object Security.Principal.WindowsPrincipal($identity)
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        throw 'Open Windows PowerShell as Administrator to change the state.'
-    }
+$identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = New-Object Security.Principal.WindowsPrincipal($identity)
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    throw 'Open Windows PowerShell as Administrator to manage Windows Login Camera.'
 }
 
 $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue

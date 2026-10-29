@@ -32,18 +32,17 @@ Set-ExecutionPolicy -Scope Process Bypass
 
 После установки задание Windows автоматически остаётся включённым после выключения и повторного запуска компьютера. Открывать программу вручную каждый раз не нужно.
 
-Проверить состояние можно в PowerShell:
+Откройте PowerShell **от имени администратора**. Проверить состояние:
 
 ```powershell
-& "$env:ProgramData\WindowsLoginCamera\Control.ps1" status
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:ProgramData\WindowsLoginCamera\Control.ps1" -Action status
 ```
 
-Чтобы выключить или снова включить съёмку, откройте PowerShell **от имени администратора**:
+Чтобы выключить или снова включить съёмку:
 
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass
-& "$env:ProgramData\WindowsLoginCamera\Control.ps1" off
-& "$env:ProgramData\WindowsLoginCamera\Control.ps1" on
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:ProgramData\WindowsLoginCamera\Control.ps1" -Action off
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:ProgramData\WindowsLoginCamera\Control.ps1" -Action on
 ```
 
 Используйте только нужную команду: `off` выключает задание, `on` включает его. Выбранное состояние сохраняется после перезагрузки. `off` не удаляет программу и уже сделанные снимки.
