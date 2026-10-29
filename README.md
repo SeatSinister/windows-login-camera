@@ -1,39 +1,41 @@
 # Windows Login Camera
 
-Takes a webcam photo after a wrong password at the Windows sign-in or unlock screen. Files are saved locally in **Documents/Windows Login Camera** with date and time in the filename. No photo is uploaded. The program does not impose a retry limit or lockout timer.
+Программа делает **снимок с веб-камеры после неверного пароля** на экране входа или разблокировки Windows. Фото сохраняются только на компьютере в папке **Документы/Windows Login Camera**. Имя каждого файла содержит дату и время. Программа не ограничивает число попыток и не добавляет тайм-аут.
 
-## Requirements
+## Что понадобится
 
-- Windows 10 or 11 and an available webcam.
-- Administrator rights to install the event task.
-- FFmpeg with DirectShow support. Install with `winget install --id Gyan.FFmpeg --exact`, then reopen PowerShell.
-- Camera access enabled under Windows Settings → Privacy & security → Camera, including desktop apps.
+- Windows 10 или 11 и работающая веб-камера.
+- Права администратора для установки задания Windows.
+- FFmpeg с поддержкой DirectShow. Установка: `winget install --id Gyan.FFmpeg --exact`. После установки откройте PowerShell заново.
+- Доступ к камере в «Параметры → Конфиденциальность и безопасность → Камера», в том числе для классических приложений.
 
-Find the camera name in Windows PowerShell:
+Узнайте точное название камеры в PowerShell:
 
 ```powershell
 ffmpeg -list_devices true -f dshow -i dummy
 ```
 
-Run PowerShell **as Administrator** in this project folder, replacing the example camera name with the exact listed name:
+Откройте PowerShell **от имени администратора** в папке проекта и подставьте название своей камеры:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
 .\Install.ps1 -CameraName 'Integrated Camera'
 ```
 
-The installer takes test photos as your account and as SYSTEM, enables failed logon auditing, and registers a Windows event task. Then lock Windows and enter an incorrect password once. Check **Documents/Windows Login Camera** for a JPG. If no photo appears, read `errors.log` and the timestamped `.ffmpeg.log` there. Only the locked-screen test proves capture works while Windows is locked. Some cameras or Windows privacy settings may block background capture.
+Установщик проверит камеру сначала от вашего имени, затем от имени SYSTEM, включит аудит неудачных входов и создаст задание Windows. После установки заблокируйте компьютер и один раз введите неверный пароль. Новый JPG должен появиться в **Документы/Windows Login Camera**. Если снимка нет, проверьте `errors.log` и файл `*.ffmpeg.log` в этой папке.
 
-The task starts only when Windows writes Security event 4625. The script accepts interactive logon types 2, 7, and 11 and wrong-password status `0xC000006A`. PIN and Windows Hello behavior may differ across devices and might not produce this status. There is no resident process at idle. FFmpeg starts briefly per failed attempt, so several simultaneous failures may briefly use more memory.
+**Важно:** только проверка на заблокированном экране подтверждает, что камера работает именно во время входа. Некоторые камеры и настройки приватности Windows не допускают фоновый захват. В таком случае установщик или журнал ошибок сообщит о проблеме.
 
-To remove the task, run `Uninstall.ps1` as Administrator. It keeps photos and Windows audit settings.
+Задание запускается по событию безопасности Windows 4625. Обрабатываются интерактивные типы входа 2, 7 и 11 с кодом неверного пароля `0xC000006A`. Ошибка PIN или Windows Hello на отдельных устройствах может записываться иначе. В режиме ожидания нет постоянно работающего процесса; FFmpeg запускается лишь на время снимка.
 
-## Privacy
+Для удаления задания запустите `Uninstall.ps1` от имени администратора. Фото и настройки аудита при этом сохраняются.
 
-Only use this on a computer you own or administer, and tell other users about the camera. Photos can contain personal information. The task runs as SYSTEM so it can read the Security event log; review the script before installing it. Keep the photo folder private and delete old photos when no longer needed.
+## Приватность
 
-## Technical references
+Используйте программу только на своём компьютере или компьютере, которым вы управляете, и предупредите других пользователей о камере. Фото могут содержать личные данные. Задание работает от имени SYSTEM, чтобы читать журнал безопасности Windows. Просмотрите код перед установкой и удаляйте старые фото, когда они больше не нужны.
 
-- [Windows event 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
-- [Task Scheduler event triggers and ValueQueries](https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-valuequeries-eventtriggertype-element)
-- [Windows camera privacy](https://learn.microsoft.com/en-us/windows/apps/develop/camera/camera-privacy-setting)
+## Документация Windows
+
+- [Событие 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
+- [Задания по событиям и ValueQueries](https://learn.microsoft.com/en-us/windows/win32/taskschd/taskschedulerschema-valuequeries-eventtriggertype-element)
+- [Доступ к камере](https://learn.microsoft.com/en-us/windows/apps/develop/camera/camera-privacy-setting)
